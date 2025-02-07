@@ -1,0 +1,11 @@
+### Get Index
+GET http://localhost:3001/
+
+### Get Menus
+GET http://localhost:3001/menus
+
+### Get Categories
+GET http://localhost:3001/categories
+
+### Get Menus by Category
+GET http://localhost:3001/categories/1/menus
