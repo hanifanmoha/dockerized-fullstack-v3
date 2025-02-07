@@ -1,0 +1,7 @@
+
+Scope
+- User can post a sweep with a single page
+- User can show his or her own sweep
+
+Out of scope
+- Login
