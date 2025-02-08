@@ -66,7 +66,7 @@ func (s *Service) GetMenus() []Menu {
 }
 
 func (s *Service) GetMenusByCategory(categoryID int) []Menu {
-	menus := s.GetMenus()
+	menus := []Menu{}
 	for _, menu := range mockMenus {
 		if menu.CategoryID == categoryID {
 			menus = append(menus, menu)
@@ -114,8 +114,7 @@ func (h *Handler) GetMenus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetMenusByCategory(w http.ResponseWriter, r *http.Request) {
-	categoryIDStr := r.URL.Query().Get("categoryID")
-	fmt.Println("Category ID:", categoryIDStr)
+	categoryIDStr := r.PathValue("categoryID")
 	categoryID, err := strconv.Atoi(categoryIDStr)
 	if err != nil {
 		http.Error(w, "Invalid category ID", http.StatusBadRequest)
