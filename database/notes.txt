@@ -1,0 +1,3 @@
+Reexecute init.sql
+
+docker exec -it my-postgres psql -U adminresto -d restodb -f /docker-entrypoint-initdb.d/init.sql

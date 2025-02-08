@@ -8,4 +8,4 @@ GET http://localhost:3001/menus
 GET http://localhost:3001/categories
 
 ### Get Menus by Category
-GET http://localhost:3001/categories/1/menus
+GET http://localhost:3001/categories/e/menus

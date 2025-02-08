@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // Model
@@ -25,63 +28,82 @@ type Menu struct {
 	Category Category
 }
 
-var mockCategories = []Category{
-	{ID: 1, Name: "Main Course"},
-	{ID: 2, Name: "Beverage"},
-	{ID: 3, Name: "Dessert"},
+// Layer 3: Repository
+
+type PostgreDB struct {
+	db *gorm.DB
 }
 
-var mockMenus = []Menu{
-	{ID: 1, Name: "Beef Steak", Price: 25.99, CategoryID: 1},
-	{ID: 2, Name: "Grilled Salmon", Price: 22.99, CategoryID: 1},
-	{ID: 3, Name: "Chicken Alfredo", Price: 18.99, CategoryID: 1},
-	{ID: 4, Name: "Iced Tea", Price: 3.99, CategoryID: 2},
-	{ID: 5, Name: "Fresh Orange Juice", Price: 4.99, CategoryID: 2},
-	{ID: 6, Name: "Chocolate Cake with Ice Cream", Price: 6.99, CategoryID: 3},
-	{ID: 7, Name: "Ice Cream Sundae", Price: 5.99, CategoryID: 3},
+func (p *PostgreDB) InitDB() {
+	dsn := "host=localhost user=adminresto password=passresto dbname=restodb port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+	p.db = db
+}
+
+func (p *PostgreDB) GetCategories() []Category {
+	var categories []Category
+	p.db.Find(&categories)
+	return categories
+}
+
+func (p *PostgreDB) GetCategory(id int) Category {
+	var category Category
+	p.db.First(&category, id)
+	return category
+}
+
+func (p *PostgreDB) GetMenus() []Menu {
+	var menus []Menu
+	p.db.Preload("Category").Find(&menus)
+	return menus
+}
+
+func (p *PostgreDB) GetMenu(id int) Menu {
+	var menu Menu
+	p.db.Preload("Category").First(&menu, id)
+	return menu
+}
+
+func (p *PostgreDB) GetMenusByCategory(categoryID int) []Menu {
+	var menus []Menu
+	p.db.Preload("Category").Where("category_id = ?", categoryID).Find(&menus)
+	return menus
 }
 
 // Layer 2: Service
 
-type Service struct{}
+type Service struct {
+	postgreDB *PostgreDB
+}
 
 func (s *Service) GetCategories() []Category {
-	return mockCategories
+	categories := s.postgreDB.GetCategories()
+	return categories
 }
 
 func (s *Service) GetCategory(id int) Category {
-	for _, category := range mockCategories {
-		if category.ID == id {
-			return category
-		}
-	}
-	return Category{}
+	category := s.postgreDB.GetCategory(id)
+	return category
 }
 
 func (s *Service) GetMenus() []Menu {
-	for i, menu := range mockMenus {
-		mockMenus[i].Category = s.GetCategory(menu.CategoryID)
-	}
-	return mockMenus
-}
-
-func (s *Service) GetMenusByCategory(categoryID int) []Menu {
-	menus := []Menu{}
-	for _, menu := range mockMenus {
-		if menu.CategoryID == categoryID {
-			menus = append(menus, menu)
-		}
-	}
+	// handle preload category
+	menus := s.postgreDB.GetMenus()
 	return menus
 }
 
 func (s *Service) GetMenu(id int) Menu {
-	for _, menu := range mockMenus {
-		if menu.ID == id {
-			return menu
-		}
-	}
-	return Menu{}
+	menu := s.postgreDB.GetMenu(id)
+	menu.Category = s.GetCategory(menu.CategoryID)
+	return menu
+}
+
+func (s *Service) GetMenusByCategory(categoryID int) []Menu {
+	menus := s.postgreDB.GetMenusByCategory(categoryID)
+	return menus
 }
 
 // Layer 1: Handler
@@ -127,8 +149,10 @@ func (h *Handler) GetMenusByCategory(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	router := http.NewServeMux()
-	service := Service{}
 
+	postgreDB := PostgreDB{}
+	postgreDB.InitDB()
+	service := Service{postgreDB: &postgreDB}
 	handler := Handler{router: router, service: &service}
 	handler.InitRouter()
 
