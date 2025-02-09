@@ -5,7 +5,7 @@ GET http://localhost:3001/
 GET http://localhost:3001/menus
 
 ### Get Menu
-GET http://localhost:3001/menus/99
+GET http://localhost:3001/menus/18
 
 ### Save Menu
 POST http://localhost:3001/menus 
@@ -17,6 +17,20 @@ content-type: application/json
     "price": 4.5,
     "category_id": 3
 }
+
+### Update Menu
+PUT http://localhost:3001/menus/18
+content-type: application/json
+
+{
+    "name": "Waffle 3",
+    "description": "Waffle with ice cream",
+    "price": 4.5,
+    "category_id": 3
+}
+
+### Delete Menu
+DELETE http://localhost:3001/menus/24
 
 ### Get Categories
 GET http://localhost:3001/categories
@@ -34,3 +48,14 @@ content-type: application/json
 {
     "name": "Coffee"
 }
+
+### Update Category
+PUT http://localhost:3001/categories/7
+content-type: application/json
+
+{
+    "name": "Coffee 2"
+} 
+
+### Delete Category
+DELETE http://localhost:3001/categories/1

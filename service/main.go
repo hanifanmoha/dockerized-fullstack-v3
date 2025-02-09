@@ -64,6 +64,22 @@ func (p *PostgreDB) SaveCategory(category Category) (Category, error) {
 	return category, nil
 }
 
+func (p *PostgreDB) UpdateCategory(category Category) (Category, error) {
+	result := p.db.Save(&category)
+	if result.Error != nil {
+		return Category{}, result.Error
+	}
+	return category, nil
+}
+
+func (p *PostgreDB) DeleteCategory(id int) error {
+	result := p.db.Delete(&Category{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func (p *PostgreDB) GetMenus() ([]Menu, error) {
 	var menus []Menu
 	err := p.db.Preload("Category").Find(&menus).Error
@@ -90,6 +106,30 @@ func (p *PostgreDB) SaveMenu(menu Menu) (Menu, error) {
 	return menu, nil
 }
 
+func (p *PostgreDB) UpdateMenu(menu Menu) (Menu, error) {
+	result := p.db.Save(&menu)
+	if result.Error != nil {
+		return Menu{}, result.Error
+	}
+	return menu, nil
+}
+
+func (p *PostgreDB) DeleteMenu(id int) error {
+	result := p.db.Delete(&Menu{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (p *PostgreDB) DeleteMenuByCategory(categoryID int) error {
+	result := p.db.Delete(&Menu{}, "category_id = ?", categoryID)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 // Layer 2: Service
 
 type Service struct {
@@ -109,6 +149,27 @@ func (s *Service) GetCategory(id int) (Category, error) {
 func (s *Service) SaveCategory(category Category) (Category, error) {
 	category, err := s.postgreDB.SaveCategory(category)
 	return category, err
+}
+
+func (s *Service) UpdateCategory(category Category) (Category, error) {
+	category, err := s.postgreDB.UpdateCategory(category)
+	return category, err
+}
+
+func (s *Service) DeleteCategory(id int) error {
+	// TODO: Transaction
+	_, err := s.GetCategory(id)
+	if err != nil {
+		err = errors.New("failed to get category")
+		return err
+	}
+	err = s.postgreDB.DeleteMenuByCategory(id)
+	if err != nil {
+		err = errors.New("failed to delete category")
+		return err
+	}
+	err = s.postgreDB.DeleteCategory(id)
+	return err
 }
 
 func (s *Service) GetMenus() ([]Menu, error) {
@@ -139,6 +200,31 @@ func (s *Service) SaveMenu(menu Menu) (Menu, error) {
 	return menu, err
 }
 
+func (s *Service) UpdateMenu(menu Menu) (Menu, error) {
+	category, err := s.GetCategory(menu.CategoryID)
+	if err != nil {
+		err = errors.New("failed to get category")
+		return Menu{}, err
+	}
+	menu, err = s.postgreDB.UpdateMenu(menu)
+	if err != nil {
+		err = errors.New("failed to update menu")
+		return Menu{}, err
+	}
+	menu.Category = category
+	return menu, nil
+}
+
+func (s *Service) DeleteMenu(id int) error {
+	_, err := s.GetMenu(id)
+	if err != nil {
+		err = errors.New("failed to get menu")
+		return err
+	}
+	err = s.postgreDB.DeleteMenu(id)
+	return err
+}
+
 // Layer 1: Handler
 
 type Handler struct {
@@ -152,11 +238,15 @@ func (h *Handler) InitRouter() {
 	h.router.HandleFunc("GET /categories/{categoryID}", h.GetCategory)
 	h.router.HandleFunc("GET /categories/{categoryID}/menus", h.GetMenusByCategory)
 	h.router.HandleFunc("POST /categories", h.SaveCategory)
+	h.router.HandleFunc("PUT /categories/{categoryID}", h.UpdateCategory)
+	h.router.HandleFunc("DELETE /categories/{categoryID}", h.DeleteCategory)
 
 	// Menu
 	h.router.HandleFunc("GET /menus", h.GetMenus)
 	h.router.HandleFunc("GET /menus/{menuID}", h.GetMenu)
 	h.router.HandleFunc("POST /menus", h.SaveMenu)
+	h.router.HandleFunc("PUT /menus/{menuID}", h.UpdateMenu)
+	h.router.HandleFunc("DELETE /menus/{menuID}", h.DeleteMenu)
 }
 
 func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
@@ -196,6 +286,44 @@ func (h *Handler) SaveCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pkg.NewSuccessResponse(w, "Success", category)
+}
+
+func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
+	categoryIDStr := r.PathValue("categoryID")
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Invalid category ID", err.Error())
+		return
+	}
+
+	category := Category{}
+	err = json.NewDecoder(r.Body).Decode(&category)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Failed to decode category", err.Error())
+		return
+	}
+	category.ID = categoryID
+	category, err = h.service.UpdateCategory(category)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Failed to update category", err.Error())
+		return
+	}
+	pkg.NewSuccessResponse(w, "Success", category)
+}
+
+func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	categoryIDStr := r.PathValue("categoryID")
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Invalid category ID", err.Error())
+		return
+	}
+	err = h.service.DeleteCategory(categoryID)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Failed to delete category", err.Error())
+		return
+	}
+	pkg.NewSuccessResponse(w, "Success", categoryID)
 }
 
 func (h *Handler) GetMenus(w http.ResponseWriter, r *http.Request) {
@@ -250,6 +378,43 @@ func (h *Handler) SaveMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pkg.NewSuccessResponse(w, "Success", menu)
+}
+
+func (h *Handler) UpdateMenu(w http.ResponseWriter, r *http.Request) {
+	menuIDStr := r.PathValue("menuID")
+	menuID, err := strconv.Atoi(menuIDStr)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Invalid menu ID", err.Error())
+		return
+	}
+	menu := Menu{}
+	err = json.NewDecoder(r.Body).Decode(&menu)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Failed to decode menu", err.Error())
+		return
+	}
+	menu.ID = menuID
+	menu, err = h.service.UpdateMenu(menu)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Failed to update menu", err.Error())
+		return
+	}
+	pkg.NewSuccessResponse(w, "Success", menu)
+}
+
+func (h *Handler) DeleteMenu(w http.ResponseWriter, r *http.Request) {
+	menuIDStr := r.PathValue("menuID")
+	menuID, err := strconv.Atoi(menuIDStr)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Invalid menu ID", err.Error())
+		return
+	}
+	err = h.service.DeleteMenu(menuID)
+	if err != nil {
+		pkg.NewErrorResponse(w, "Failed to delete menu", err.Error())
+		return
+	}
+	pkg.NewSuccessResponse(w, "Success", menuID)
 }
 
 func main() {
