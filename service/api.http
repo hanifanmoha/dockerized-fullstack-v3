@@ -4,8 +4,33 @@ GET http://localhost:3001/
 ### Get Menus
 GET http://localhost:3001/menus
 
+### Get Menu
+GET http://localhost:3001/menus/99
+
+### Save Menu
+POST http://localhost:3001/menus 
+content-type: application/json
+
+{
+    "name": "Waffle",
+    "description": "Waffle with ice cream",
+    "price": 4.5,
+    "category_id": 3
+}
+
 ### Get Categories
 GET http://localhost:3001/categories
 
+### Get Category
+GET http://localhost:3001/categories/7
+
 ### Get Menus by Category
-GET http://localhost:3001/categories/e/menus
+GET http://localhost:3001/categories/3/menus
+
+### Save Category
+POST http://localhost:3001/categories
+content-type: application/json
+
+{
+    "name": "Coffee"
+}
