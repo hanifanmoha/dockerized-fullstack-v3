@@ -11,7 +11,9 @@ function Layout({ children }: { children: React.ReactNode }) {
         <Sidebar />
 
         <main className="p-4 md:ml-64 h-auto pt-20">
-            {children}
+            <div className="p-2 min-h-screen">
+                {children}
+            </div>
         </main>
     </div>
 }
