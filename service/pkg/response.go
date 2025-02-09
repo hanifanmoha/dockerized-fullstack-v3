@@ -6,23 +6,28 @@ import (
 )
 
 type Response struct {
-	Status  bool        `json:"status"`
+	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Error   string      `json:"error"`
 	Data    interface{} `json:"data"`
 }
 
-func NewResponse(status bool, message string, error string, data interface{}) *Response {
+func NewResponse(success bool, message string, error string, data interface{}) *Response {
 	return &Response{
-		Status:  status,
+		Success: success,
 		Message: message,
 		Error:   error,
 		Data:    data,
 	}
 }
 
+func setDefaultHeaders(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Content-Type", "application/json")
+}
+
 func NewSuccessResponse(w http.ResponseWriter, message string, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
+	setDefaultHeaders(&w)
 	w.WriteHeader(http.StatusOK)
 
 	response := NewResponse(true, message, "", data)
@@ -30,7 +35,7 @@ func NewSuccessResponse(w http.ResponseWriter, message string, data interface{})
 }
 
 func NewErrorResponse(w http.ResponseWriter, message string, error string) {
-	w.Header().Set("Content-Type", "application/json")
+	setDefaultHeaders(&w)
 	w.WriteHeader(http.StatusInternalServerError)
 
 	response := NewResponse(false, message, error, nil)
