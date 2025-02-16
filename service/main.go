@@ -196,7 +196,13 @@ func (s *Service) GetMenus() ([]Menu, error) {
 
 func (s *Service) GetMenu(id int) (Menu, error) {
 	menu, err := s.postgreDB.GetMenu(id)
+	if err != nil {
+		return Menu{}, err
+	}
 	category, err := s.GetCategory(menu.CategoryID)
+	if err != nil {
+		return Menu{}, err
+	}
 	menu.Category = category
 	return menu, err
 }

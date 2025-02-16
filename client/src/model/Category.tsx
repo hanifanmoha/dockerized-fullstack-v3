@@ -1,6 +1,6 @@
 export interface ICategory {
-    id: number
-    name: string
+    id?: number
+    name?: string
 }
 
 class Category implements ICategory {
@@ -8,12 +8,15 @@ class Category implements ICategory {
     name: string
 
     constructor({ id, name }: ICategory) {
-        this.id = id
-        this.name = name
+        this.id = id ?? 0
+        this.name = name ?? ''
     }
 
-    static fromJson(json: ICategory): Category {
-        return new Category(json)
+    static fromJson(json: any): Category {
+        const category = new Category({})
+        category.id = json.id ?? 0
+        category.name = json.name ?? ''
+        return category
     }
 }
 

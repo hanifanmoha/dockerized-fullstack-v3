@@ -9,7 +9,7 @@ function Sidebar() {
         <div className="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
             <ul className="space-y-2">
                 <li>
-                    <Link to="/" className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <Link to="/menus" className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg
                             aria-hidden="true"
                             className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"

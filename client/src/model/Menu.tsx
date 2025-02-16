@@ -1,34 +1,44 @@
 import Category, { ICategory } from "./Category"
 
 export interface IMenu {
-    id: number
-    name: string
-    description: string
-    price: number
-    category: ICategory
+    id?: number
+    name?: string
+    description?: string
+    price?: number
+    categoryID?: number
+    category?: ICategory
 }
 
-class Menu implements IMenu {
+class Menu {
     id: number
     name: string
     description: string
     price: number
-    category: ICategory
+    categoryID: number
+    category: ICategory | undefined
 
-    constructor({ id, name, description, price, category }: IMenu) {
-        this.id = id
-        this.name = name
-        this.description = description
-        this.price = price
-        this.category = Category.fromJson(category)
+    constructor({ id, name, description, price, categoryID, category }: IMenu) {
+        this.id = id ?? 0
+        this.name = name ?? ''
+        this.description = description ?? ''
+        this.price = price ?? 0
+        this.categoryID = categoryID ?? 0
+        this.category = category ?? undefined
     }
 
-    static fromJson(json: IMenu): Menu {
-        return new Menu(json)
+    static fromJson(json: any): Menu {
+        const menu = new Menu({})
+        menu.id = json.id ?? 0
+        menu.name = json.name ?? ''
+        menu.description = json.description ?? ''
+        menu.price = json.price ?? 0
+        menu.categoryID = json.category_id ?? 0
+        menu.category = json.category ? Category.fromJson(json.category) : undefined
+        return menu
     }
 
     getCategoryName(): string {
-        return this.category.name
+        return this.category?.name ?? ''
     }
 
 }

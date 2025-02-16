@@ -11,20 +11,48 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as CategoriesImport } from './routes/categories'
 import { Route as IndexImport } from './routes/index'
+import { Route as MenusIndexImport } from './routes/menus/index'
+import { Route as CategoriesIndexImport } from './routes/categories/index'
+import { Route as MenusCreateImport } from './routes/menus/create'
+import { Route as MenusMenuIDIndexImport } from './routes/menus/$menuID/index'
+import { Route as MenusMenuIDEditImport } from './routes/menus/$menuID/edit'
 
 // Create/Update Routes
-
-const CategoriesRoute = CategoriesImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MenusIndexRoute = MenusIndexImport.update({
+  id: '/menus/',
+  path: '/menus/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CategoriesIndexRoute = CategoriesIndexImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MenusCreateRoute = MenusCreateImport.update({
+  id: '/menus/create',
+  path: '/menus/create',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MenusMenuIDIndexRoute = MenusMenuIDIndexImport.update({
+  id: '/menus/$menuID/',
+  path: '/menus/$menuID/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MenusMenuIDEditRoute = MenusMenuIDEditImport.update({
+  id: '/menus/$menuID/edit',
+  path: '/menus/$menuID/edit',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +67,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/categories': {
-      id: '/categories'
+    '/menus/create': {
+      id: '/menus/create'
+      path: '/menus/create'
+      fullPath: '/menus/create'
+      preLoaderRoute: typeof MenusCreateImport
+      parentRoute: typeof rootRoute
+    }
+    '/categories/': {
+      id: '/categories/'
       path: '/categories'
       fullPath: '/categories'
-      preLoaderRoute: typeof CategoriesImport
+      preLoaderRoute: typeof CategoriesIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/menus/': {
+      id: '/menus/'
+      path: '/menus'
+      fullPath: '/menus'
+      preLoaderRoute: typeof MenusIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/menus/$menuID/edit': {
+      id: '/menus/$menuID/edit'
+      path: '/menus/$menuID/edit'
+      fullPath: '/menus/$menuID/edit'
+      preLoaderRoute: typeof MenusMenuIDEditImport
+      parentRoute: typeof rootRoute
+    }
+    '/menus/$menuID/': {
+      id: '/menus/$menuID/'
+      path: '/menus/$menuID'
+      fullPath: '/menus/$menuID'
+      preLoaderRoute: typeof MenusMenuIDIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +109,76 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/categories': typeof CategoriesRoute
+  '/menus/create': typeof MenusCreateRoute
+  '/categories': typeof CategoriesIndexRoute
+  '/menus': typeof MenusIndexRoute
+  '/menus/$menuID/edit': typeof MenusMenuIDEditRoute
+  '/menus/$menuID': typeof MenusMenuIDIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/categories': typeof CategoriesRoute
+  '/menus/create': typeof MenusCreateRoute
+  '/categories': typeof CategoriesIndexRoute
+  '/menus': typeof MenusIndexRoute
+  '/menus/$menuID/edit': typeof MenusMenuIDEditRoute
+  '/menus/$menuID': typeof MenusMenuIDIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/categories': typeof CategoriesRoute
+  '/menus/create': typeof MenusCreateRoute
+  '/categories/': typeof CategoriesIndexRoute
+  '/menus/': typeof MenusIndexRoute
+  '/menus/$menuID/edit': typeof MenusMenuIDEditRoute
+  '/menus/$menuID/': typeof MenusMenuIDIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/categories'
+  fullPaths:
+    | '/'
+    | '/menus/create'
+    | '/categories'
+    | '/menus'
+    | '/menus/$menuID/edit'
+    | '/menus/$menuID'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/categories'
-  id: '__root__' | '/' | '/categories'
+  to:
+    | '/'
+    | '/menus/create'
+    | '/categories'
+    | '/menus'
+    | '/menus/$menuID/edit'
+    | '/menus/$menuID'
+  id:
+    | '__root__'
+    | '/'
+    | '/menus/create'
+    | '/categories/'
+    | '/menus/'
+    | '/menus/$menuID/edit'
+    | '/menus/$menuID/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CategoriesRoute: typeof CategoriesRoute
+  MenusCreateRoute: typeof MenusCreateRoute
+  CategoriesIndexRoute: typeof CategoriesIndexRoute
+  MenusIndexRoute: typeof MenusIndexRoute
+  MenusMenuIDEditRoute: typeof MenusMenuIDEditRoute
+  MenusMenuIDIndexRoute: typeof MenusMenuIDIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CategoriesRoute: CategoriesRoute,
+  MenusCreateRoute: MenusCreateRoute,
+  CategoriesIndexRoute: CategoriesIndexRoute,
+  MenusIndexRoute: MenusIndexRoute,
+  MenusMenuIDEditRoute: MenusMenuIDEditRoute,
+  MenusMenuIDIndexRoute: MenusMenuIDIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +192,30 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/categories"
+        "/menus/create",
+        "/categories/",
+        "/menus/",
+        "/menus/$menuID/edit",
+        "/menus/$menuID/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/categories": {
-      "filePath": "categories.tsx"
+    "/menus/create": {
+      "filePath": "menus/create.tsx"
+    },
+    "/categories/": {
+      "filePath": "categories/index.tsx"
+    },
+    "/menus/": {
+      "filePath": "menus/index.tsx"
+    },
+    "/menus/$menuID/edit": {
+      "filePath": "menus/$menuID/edit.tsx"
+    },
+    "/menus/$menuID/": {
+      "filePath": "menus/$menuID/index.tsx"
     }
   }
 }
