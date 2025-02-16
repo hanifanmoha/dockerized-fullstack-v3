@@ -11,3 +11,20 @@ services:
       - "5432:5432"
     volumes:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+  service:
+    build:
+      context: ./service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - GREETING=Hello World From Docker Compose
+      - SERVER_PORT=3001
+      - SERVER_HOST=0.0.0.0
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=adminresto
+      - DB_PASSWORD=passresto
+      - DB_NAME=restodb
+    depends_on:
+      - db

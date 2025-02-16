@@ -3,11 +3,14 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"sweepservice/pkg"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -29,14 +32,27 @@ type Menu struct {
 	Category Category `json:"category"`
 }
 
+type DBConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	DBName   string
+}
+
+type Config struct {
+	Port     string
+	DBConfig DBConfig
+}
+
 // Layer 3: Repository
 
 type PostgreDB struct {
 	db *gorm.DB
 }
 
-func (p *PostgreDB) InitDB() {
-	dsn := "host=localhost user=adminresto password=passresto dbname=restodb port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+func (p *PostgreDB) InitDB(config DBConfig) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta", config.Host, config.User, config.Password, config.DBName, config.Port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
@@ -417,18 +433,51 @@ func (h *Handler) DeleteMenu(w http.ResponseWriter, r *http.Request) {
 	pkg.NewSuccessResponse(w, "Success", menuID)
 }
 
-func main() {
+// Init Config
 
+func GetEnv(key string, defaultValue string) string {
+	env := os.Getenv(key)
+	if env == "" {
+		return defaultValue
+	}
+	return env
+}
+
+func InitConfig() Config {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("Failed to load .env file", err)
+		fmt.Println("Using default config")
+	}
+
+	fmt.Println("GREETING : ", GetEnv("GREETING", "No Env Loaded!"))
+
+	return Config{
+		Port: GetEnv("SERVER_PORT", "3001"),
+		DBConfig: DBConfig{
+			Host:     GetEnv("DB_HOST", "localhost"),
+			Port:     GetEnv("DB_PORT", "5432"),
+			User:     GetEnv("DB_USER", "adminresto"),
+			Password: GetEnv("DB_PASSWORD", "passresto"),
+			DBName:   GetEnv("DB_NAME", "restodb"),
+		},
+	}
+}
+
+func main() {
+	config := InitConfig()
 	router := http.NewServeMux()
 
+	// TODOS: Init Config
+
 	postgreDB := PostgreDB{}
-	postgreDB.InitDB()
+	postgreDB.InitDB(config.DBConfig)
 	service := Service{postgreDB: &postgreDB}
 	handler := Handler{router: router, service: &service}
 	handler.InitRouter()
 
 	server := http.Server{
-		Addr:    ":3001",
+		Addr:    fmt.Sprintf(":%s", config.Port),
 		Handler: router,
 	}
 
