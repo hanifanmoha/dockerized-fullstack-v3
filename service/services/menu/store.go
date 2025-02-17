@@ -16,13 +16,13 @@ func NewStore(db *gorm.DB) *Store {
 
 func (s *Store) GetAll() ([]types.Menu, error) {
 	var menus []types.Menu
-	err := s.db.Find(&menus).Error
+	err := s.db.Preload("Category").Find(&menus).Error
 	return menus, err
 }
 
 func (s *Store) GetByID(id int) (types.Menu, error) {
 	var menu types.Menu
-	err := s.db.First(&menu, id).Error
+	err := s.db.Preload("Category").First(&menu, id).Error
 	return menu, err
 }
 
