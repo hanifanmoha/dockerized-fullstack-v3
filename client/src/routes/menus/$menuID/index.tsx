@@ -22,10 +22,8 @@ function RouteComponent() {
 
 
           <div className="flex justify-end space-x-4">
-            <Link to="/menus/$menuID/edit" params={{ menuID: menu.id.toString() }}>
-              <a className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                Edit
-              </a>
+            <Link to="/menus/$menuID/edit" params={{ menuID: menu.id.toString() }} className='font-medium text-cyan-600 hover:underline dark:text-cyan-500'>
+              Edit
             </Link>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
