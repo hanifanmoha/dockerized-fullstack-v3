@@ -12,31 +12,31 @@ POST http://localhost:3001/menus
 content-type: application/json
 
 {
-    "name": "Waffle",
-    "description": "Waffle with ice cream",
+    "name": "na",
+    "description": "",
     "price": 4.5,
     "category_id": 3
 }
 
 ### Update Menu
-PUT http://localhost:3001/menus/18
+PUT http://localhost:3001/menus/19
 content-type: application/json
 
 {
-    "name": "Waffle 3",
+    "name": "Naskun telor",
     "description": "Waffle with ice cream",
     "price": 4.5,
     "category_id": 3
 }
 
 ### Delete Menu
-DELETE http://localhost:3001/menus/24
+DELETE http://localhost:3001/menus/19
 
 ### Get Categories
 GET http://localhost:3001/categories
 
 ### Get Category
-GET http://localhost:3001/categories/7
+GET http://localhost:3001/categories/2
 
 ### Get Menus by Category
 GET http://localhost:3001/categories/3/menus
@@ -54,8 +54,8 @@ PUT http://localhost:3001/categories/7
 content-type: application/json
 
 {
-    "name": "Coffee 2"
+    "name": "Western"
 } 
 
 ### Delete Category
-DELETE http://localhost:3001/categories/1
+DELETE http://localhost:3001/categories/4

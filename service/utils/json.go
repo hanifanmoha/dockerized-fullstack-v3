@@ -1,19 +1,20 @@
-package pkg
+package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
-type Response struct {
+type GeneralResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Error   string      `json:"error"`
 	Data    interface{} `json:"data"`
 }
 
-func NewResponse(success bool, message string, error string, data interface{}) *Response {
-	return &Response{
+func NewResponse(success bool, message string, error string, data interface{}) *GeneralResponse {
+	return &GeneralResponse{
 		Success: success,
 		Message: message,
 		Error:   error,
@@ -26,18 +27,26 @@ func setDefaultHeaders(w *http.ResponseWriter) {
 	(*w).Header().Set("Content-Type", "application/json")
 }
 
-func NewSuccessResponse(w http.ResponseWriter, message string, data interface{}) {
+func NewSuccessResponse(w http.ResponseWriter, status int, message string, data interface{}) {
 	setDefaultHeaders(&w)
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(status)
 
 	response := NewResponse(true, message, "", data)
 	json.NewEncoder(w).Encode(response)
 }
 
-func NewErrorResponse(w http.ResponseWriter, message string, error string) {
+func NewErrorResponse(w http.ResponseWriter, status int, message string, error string) {
 	setDefaultHeaders(&w)
-	w.WriteHeader(http.StatusInternalServerError)
+	w.WriteHeader(status)
 
 	response := NewResponse(false, message, error, nil)
 	json.NewEncoder(w).Encode(response)
+}
+
+func ParseJSON(r *http.Request, v any) error {
+	if r.Body == nil {
+		return fmt.Errorf("missing request body")
+	}
+
+	return json.NewDecoder(r.Body).Decode(v)
 }
