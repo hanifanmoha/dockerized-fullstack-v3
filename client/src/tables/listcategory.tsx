@@ -1,13 +1,12 @@
 import { Link } from '@tanstack/react-router'
-
 import {
   createColumnHelper,
 } from '@tanstack/react-table'
-import Menu from '../model/Menu'
+import Category from '../model/Category'
 
-const columnHelper = createColumnHelper<Menu>()
+const columnHelper = createColumnHelper<Category>()
 
-const listMenuColumns = [
+const listCategoryColumns = [
   columnHelper.accessor('id', {
     header: () => 'ID',
     cell: (info) => info.getValue(),
@@ -16,14 +15,6 @@ const listMenuColumns = [
     header: () => 'Name',
     cell: (info) => info.getValue(),
   }),
-  columnHelper.accessor('price', {
-    header: () => 'Price',
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor('category', {
-    header: () => 'Category',
-    cell: (info) => info.row.original.getCategoryName(),
-  }),
 
   columnHelper.display({
     id: 'actions',
@@ -31,15 +22,13 @@ const listMenuColumns = [
     cell: (info) => (
       <div className="flex space-x-4">
         <Link
-          to="/menus/$menuID"
-          params={{ menuID: info.row.original.id.toString() }}
+          to="/categories"
           className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
         >
           View
         </Link>
         <Link
-          to="/menus/$menuID/edit"
-          params={{ menuID: info.row.original.id.toString() }}
+          to="/categories"
           className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
         >
           Edit
@@ -49,4 +38,4 @@ const listMenuColumns = [
   }),
 ]
 
-export default listMenuColumns
+export default listCategoryColumns

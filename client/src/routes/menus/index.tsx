@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Table } from 'flowbite-react'
 
 import {
-  flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -30,7 +28,7 @@ function RouteComponent() {
   })
 
   return (
-    <div>
+    <>
       <div className="flex pb-4 justify-between">
         <h1 className="text-xl">Menus</h1>
         <Link
@@ -41,6 +39,6 @@ function RouteComponent() {
         </Link>
       </div>
       <CustomTable table={table} />
-    </div>
+    </>
   )
 }

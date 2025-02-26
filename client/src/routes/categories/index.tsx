@@ -1,7 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import Category from '../../model/Category'
 import { Table } from 'flowbite-react'
 import { getCategories } from '../../utils/restodb'
+import listCategoryColumns from '../../tables/listcategory'
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import CustomTable from '../../components/CustomTable'
 
 export const Route = createFileRoute('/categories/')({
   component: CategoryComponent,
@@ -16,28 +19,24 @@ function CategoryComponent() {
   const data = Route.useLoaderData() as { categories: Category[] }
   const categories = data.categories.map((category) => new Category(category))
 
-  return (
-    <div className="overflow-x-auto">
-      <Table>
-        <Table.Head>
-          <Table.HeadCell>ID</Table.HeadCell>
-          <Table.HeadCell>Name</Table.HeadCell>
-        </Table.Head>
+  const table = useReactTable({
+    data: categories,
+    columns: listCategoryColumns,
+    getCoreRowModel: getCoreRowModel(),
+  })
 
-        <Table.Body className="divide-y">
-          {categories.map((category) => (
-            <Table.Row
-              key={category.id}
-              className="bg-white dark:border-gray-700 dark:bg-gray-800"
-            >
-              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                {category.id}
-              </Table.Cell>
-              <Table.Cell>{category.name}</Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
-    </div>
+  return (
+    <>
+      <div className="flex pb-4 justify-between">
+        <h1 className="text-xl">Menus</h1>
+        <Link
+          to="/categories"
+          className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
+        >
+          + Create
+        </Link>
+      </div>
+      <CustomTable table={table} />
+    </>
   )
 }
