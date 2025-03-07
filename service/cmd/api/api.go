@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"service/middleware"
 	"service/services/category"
 	"service/services/menu"
 
@@ -30,9 +31,11 @@ func (s *APIServer) Run() error {
 	menuHandler := menu.NewHandler(menuStore)
 	menuHandler.RegisterRoutes(router)
 
+	handler := middleware.CorsMiddleware(router)
+
 	server := http.Server{
 		Addr:    s.addr,
-		Handler: router,
+		Handler: handler,
 	}
 	log.Println("API Server is running on", s.addr)
 	return server.ListenAndServe()

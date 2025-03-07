@@ -37,7 +37,7 @@ function RouteComponent() {
         <div className="flex items-center justify-between border-b dark:border-gray-700 pb-4">
           <span className="text-gray-600 dark:text-gray-400">Price</span>
           <span className="font-medium text-gray-900 dark:text-white">
-            ${menu.price}
+            IDR {menu.price}
           </span>
         </div>
 

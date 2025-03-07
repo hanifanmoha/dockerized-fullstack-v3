@@ -13,7 +13,7 @@ export const axiosInstance = axios.create({
     baseURL: "http://localhost:3001",
 });
 
-export const getCategories = async () : Promise<Category[]> => {
+export const getCategories = async (): Promise<Category[]> => {
     const response = await axiosInstance.get("/categories");
     const data = response.data as Response
     if (!data.success) {
@@ -22,7 +22,7 @@ export const getCategories = async () : Promise<Category[]> => {
     return data.data.map((category: any) => Category.fromJson(category));
 };
 
-export const getCategory = async (id: number) : Promise<Category> => {
+export const getCategory = async (id: number): Promise<Category> => {
     const response = await axiosInstance.get(`/categories/${id}`);
     const data = response.data as Response
     if (!data.success) {
@@ -31,7 +31,7 @@ export const getCategory = async (id: number) : Promise<Category> => {
     return Category.fromJson(data.data);
 };
 
-export const saveCategory = async (category: Category) : Promise<Category> => {
+export const saveCategory = async (category: Category): Promise<Category> => {
     const response = await axiosInstance.post("/categories", category);
     const data = response.data as Response
     if (!data.success) {
@@ -40,7 +40,7 @@ export const saveCategory = async (category: Category) : Promise<Category> => {
     return Category.fromJson(data.data);
 };
 
-export const updateCategory = async (category: Category) : Promise<Category> => {
+export const updateCategory = async (category: Category): Promise<Category> => {
     const response = await axiosInstance.put(`/categories/${category.id}`, category);
     const data = response.data as Response
     if (!data.success) {
@@ -49,7 +49,7 @@ export const updateCategory = async (category: Category) : Promise<Category> => 
     return Category.fromJson(data.data);
 };
 
-export const deleteCategory = async (id: number) : Promise<void> => {
+export const deleteCategory = async (id: number): Promise<void> => {
     const response = await axiosInstance.delete(`/categories/${id}`);
     const data = response.data as Response
     if (!data.success) {
@@ -57,7 +57,7 @@ export const deleteCategory = async (id: number) : Promise<void> => {
     }
 };
 
-export const getMenus = async () : Promise<Menu[]> => {
+export const getMenus = async (): Promise<Menu[]> => {
     const response = await axiosInstance.get("/menus");
     const data = response.data as Response
     if (!data.success) {
@@ -66,7 +66,7 @@ export const getMenus = async () : Promise<Menu[]> => {
     return data.data.map((menu: any) => Menu.fromJson(menu));
 };
 
-export const getMenu = async (id: number) : Promise<Menu> => {
+export const getMenu = async (id: number): Promise<Menu> => {
     const response = await axiosInstance.get(`/menus/${id}`);
     const data = response.data as Response
     if (!data.success) {
@@ -75,8 +75,8 @@ export const getMenu = async (id: number) : Promise<Menu> => {
     return Menu.fromJson(data.data);
 };
 
-export const saveMenu = async (menu: Menu) : Promise<Menu> => {
-    const response = await axiosInstance.post("/menus", menu);
+export const saveMenu = async (menu: Menu): Promise<Menu> => {
+    const response = await axiosInstance.post("/menus", menu.toJson());
     const data = response.data as Response
     if (!data.success) {
         throw new Error(data.error)
@@ -84,8 +84,8 @@ export const saveMenu = async (menu: Menu) : Promise<Menu> => {
     return Menu.fromJson(data.data);
 };
 
-export const updateMenu = async (menu: Menu) : Promise<Menu> => {
-    const response = await axiosInstance.put(`/menus/${menu.id}`, menu);
+export const updateMenu = async (menu: Menu): Promise<Menu> => {
+    const response = await axiosInstance.put(`/menus/${menu.id}`, menu.toJson());
     const data = response.data as Response
     if (!data.success) {
         throw new Error(data.error)

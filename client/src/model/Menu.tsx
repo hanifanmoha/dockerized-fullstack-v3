@@ -37,6 +37,16 @@ class Menu {
         return menu
     }
 
+    toJson(): any {
+        return {
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            price: this.price,
+            category_id: this.categoryID
+        }
+    }
+
     getCategoryName(): string {
         return this.category?.name ?? ''
     }

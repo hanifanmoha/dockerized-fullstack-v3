@@ -29,7 +29,7 @@ func (h *Handler) getAllMenus(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to get menus", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", menus)
+	utils.NewSuccessResponse(w, http.StatusOK, "success 2", menus)
 }
 
 func (h *Handler) getMenuByID(w http.ResponseWriter, r *http.Request) {
