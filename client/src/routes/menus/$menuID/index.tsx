@@ -12,8 +12,7 @@ export const Route = createFileRoute('/menus/$menuID/')({
 })
 
 function RouteComponent() {
-  const data = Route.useLoaderData() as { menu: Menu }
-  const menu = data.menu
+  const { menu } = Route.useLoaderData() as { menu: Menu }
 
   return (
     <>
@@ -29,9 +28,9 @@ function RouteComponent() {
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b dark:border-gray-700 pb-4">
           <span className="text-gray-600 dark:text-gray-400">Category</span>
-          <span className="font-medium text-gray-900 dark:text-white">
+          <Link to="/categories/$categoryID" params={{ categoryID: menu.categoryID.toString() }} className='font-medium text-cyan-600 hover:underline dark:text-cyan-500'>
             {menu.getCategoryName()}
-          </span>
+          </Link>
         </div>
 
         <div className="flex items-center justify-between border-b dark:border-gray-700 pb-4">

@@ -20,10 +20,10 @@ function RouteComponent() {
 
   const form = useForm({
     defaultValues: {
-      name: 'initial name',
-      price: 1000,
-      category_id: 2,
-      description: 'tet 123'
+      name: '',
+      price: 0,
+      category_id: 0,
+      description: ''
     },
     onSubmit: async ({ value }) => {
       const newMenu = new Menu({

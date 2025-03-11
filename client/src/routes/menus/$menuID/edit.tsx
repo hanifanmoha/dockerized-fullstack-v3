@@ -15,7 +15,7 @@ export const Route = createFileRoute('/menus/$menuID/edit')({
 })
 
 function RouteComponent() {
-  const data = Route.useLoaderData() as { menu: Menu, categories: Category[] }
+  const data = Route.useLoaderData()
   const menu = data.menu
   const categories = data.categories
 

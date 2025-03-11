@@ -22,13 +22,15 @@ const listCategoryColumns = [
     cell: (info) => (
       <div className="flex space-x-4">
         <Link
-          to="/categories"
+          to="/categories/$categoryID"
+          params={{ categoryID: info.row.original.id.toString() }}
           className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
         >
           View
         </Link>
         <Link
-          to="/categories"
+          to="/categories/$categoryID/edit"
+          params={{ categoryID: info.row.original.id.toString() }}
           className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
         >
           Edit

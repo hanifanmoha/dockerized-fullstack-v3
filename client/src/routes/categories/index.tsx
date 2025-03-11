@@ -17,7 +17,7 @@ export const Route = createFileRoute('/categories/')({
 
 function CategoryComponent() {
   const data = Route.useLoaderData() as { categories: Category[] }
-  const categories = data.categories.map((category) => new Category(category))
+  const categories = data.categories
 
   const table = useReactTable({
     data: categories,
@@ -28,9 +28,9 @@ function CategoryComponent() {
   return (
     <>
       <div className="flex pb-4 justify-between">
-        <h1 className="text-xl">Menus</h1>
+        <h1 className="text-xl">Categories</h1>
         <Link
-          to="/categories"
+          to="/categories/create"
           className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
         >
           + Create
