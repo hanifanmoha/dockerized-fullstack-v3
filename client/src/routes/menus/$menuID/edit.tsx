@@ -3,6 +3,7 @@ import { useForm } from '@tanstack/react-form'
 import { getMenu, getCategories, updateMenu } from '../../../utils/restodb'
 import Category from '../../../model/Category'
 import Menu from '../../../model/Menu'
+import FieldError from '../../../components/FieldError'
 
 export const Route = createFileRoute('/menus/$menuID/edit')({
   component: RouteComponent,
@@ -26,7 +27,7 @@ function RouteComponent() {
       id: menu.id,
       name: menu.name,
       category_id: menu.categoryID,
-      price: menu.price,
+      price: menu.price.toString(),
       description: menu.description
     },
     onSubmit: async ({ value }) => {
@@ -34,7 +35,7 @@ function RouteComponent() {
         id: value.id,
         name: value.name,
         categoryID: value.category_id,
-        price: value.price,
+        price: Number(value.price),
         description: value.description
       })
       try {
@@ -60,6 +61,17 @@ function RouteComponent() {
       }}>
         <form.Field
           name='name'
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) {
+                return 'Name is required'
+              }
+              if (value.length < 3) {
+                return 'Name must be at least 3 characters long'
+              }
+              return undefined
+            }
+          }}
           children={(field) => {
             return (
               <div>
@@ -75,6 +87,7 @@ function RouteComponent() {
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   required
                 />
+                <FieldError errors={field.state.meta.errors} />
               </div>
             )
           }}
@@ -82,6 +95,20 @@ function RouteComponent() {
 
         <form.Field
           name='price'
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) {
+                return 'Price is required'
+              }
+              if (!Number(value)) {
+                return 'Price must be a number'
+              }
+              if (Number(value) < 0) {
+                return 'Price must be a positive number'
+              }
+              return undefined
+            }
+          }}
           children={(field) => {
             return <div>
               <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -92,16 +119,28 @@ function RouteComponent() {
                 id="price"
                 name="price"
                 value={field.state.value}
-                onChange={(e) => field.handleChange(Number(e.target.value))}
+                onChange={(e => {
+                  const val = !e.target.value ? '' : Number(e.target.value) + ''
+                  field.handleChange(val)
+                })}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                 required
               />
+              <FieldError errors={field.state.meta.errors} />
             </div>
           }}
         />
 
         <form.Field
           name='category_id'
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) {
+                return 'Category is required'
+              }
+              return undefined
+            }
+          }}
           children={(field) => {
             return <div>
               <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -120,12 +159,24 @@ function RouteComponent() {
                   </option>
                 ))}
               </select>
+              <FieldError errors={field.state.meta.errors} />
             </div>
           }}
         />
 
         <form.Field
           name='description'
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) {
+                return 'Description is required'
+              }
+              if (value.length < 3) {
+                return 'Description must be at least 3 characters long'
+              }
+              return undefined
+            }
+          }}
           children={(field) => {
             return <div>
               <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -139,6 +190,7 @@ function RouteComponent() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
               />
+              <FieldError errors={field.state.meta.errors} />
             </div>
           }}
         />

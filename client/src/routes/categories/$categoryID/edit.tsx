@@ -3,6 +3,7 @@ import { getCategory, updateCategory } from '../../../utils/restodb'
 import Category from '../../../model/Category'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
+import FieldError from '../../../components/FieldError'
 
 export const Route = createFileRoute('/categories/$categoryID/edit')({
     component: RouteComponent,
@@ -49,6 +50,17 @@ function RouteComponent() {
         }}>
             <form.Field
                 name='name'
+                validators={{
+                    onChange: ({ value }) => {
+                        if (!value) {
+                            return 'Name is required'
+                        }
+                        if (value.length < 3) {
+                            return 'Name must be at least 3 characters long'
+                        }
+                        return undefined
+                    }
+                }}
                 children={(field) => {
                     return (
                         <div>
@@ -64,6 +76,7 @@ function RouteComponent() {
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                 required
                             />
+                            <FieldError errors={field.state.meta.errors} />
                         </div>
                     )
                 }}

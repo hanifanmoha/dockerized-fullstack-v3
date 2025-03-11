@@ -32,7 +32,7 @@ export const getCategory = async (id: number): Promise<Category> => {
 };
 
 export const saveCategory = async (category: Category): Promise<Category> => {
-    const response = await axiosInstance.post("/categories", category);
+    const response = await axiosInstance.post("/categories", category.toJson());
     const data = response.data as Response
     if (!data.success) {
         throw new Error(data.error)
@@ -41,7 +41,7 @@ export const saveCategory = async (category: Category): Promise<Category> => {
 };
 
 export const updateCategory = async (category: Category): Promise<Category> => {
-    const response = await axiosInstance.put(`/categories/${category.id}`, category);
+    const response = await axiosInstance.put(`/categories/${category.id}`, category.toJson());
     const data = response.data as Response
     if (!data.success) {
         throw new Error(data.error)

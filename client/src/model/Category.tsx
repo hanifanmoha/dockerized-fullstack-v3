@@ -18,6 +18,13 @@ class Category implements ICategory {
         category.name = json.name ?? ''
         return category
     }
+
+    toJson(): any {
+        return {
+            id: this.id,
+            name: this.name
+        }
+    }
 }
 
 export default Category
