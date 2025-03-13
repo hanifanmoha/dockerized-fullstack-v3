@@ -11,14 +11,16 @@ type GeneralResponse struct {
 	Message string      `json:"message"`
 	Error   string      `json:"error"`
 	Data    interface{} `json:"data"`
+	Meta    interface{} `json:"meta,omitempty"`
 }
 
-func NewResponse(success bool, message string, error string, data interface{}) *GeneralResponse {
+func NewResponse(success bool, message string, error string, data interface{}, meta interface{}) *GeneralResponse {
 	return &GeneralResponse{
 		Success: success,
 		Message: message,
 		Error:   error,
 		Data:    data,
+		Meta:    meta,
 	}
 }
 
@@ -27,11 +29,11 @@ func setDefaultHeaders(w *http.ResponseWriter) {
 	(*w).Header().Set("Content-Type", "application/json")
 }
 
-func NewSuccessResponse(w http.ResponseWriter, status int, message string, data interface{}) {
+func NewSuccessResponse(w http.ResponseWriter, status int, message string, data interface{}, meta interface{}) {
 	setDefaultHeaders(&w)
 	w.WriteHeader(status)
 
-	response := NewResponse(true, message, "", data)
+	response := NewResponse(true, message, "", data, meta)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -39,7 +41,7 @@ func NewErrorResponse(w http.ResponseWriter, status int, message string, error s
 	setDefaultHeaders(&w)
 	w.WriteHeader(status)
 
-	response := NewResponse(false, message, error, nil)
+	response := NewResponse(false, message, error, nil, nil)
 	json.NewEncoder(w).Encode(response)
 }
 

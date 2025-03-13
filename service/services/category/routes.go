@@ -24,12 +24,17 @@ func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 }
 
 func (h *Handler) getAllCategories(w http.ResponseWriter, r *http.Request) {
-	categories, err := h.store.GetAll()
+	pagination, err := types.ParsePaginationRequest(r)
+	if err != nil {
+		utils.NewErrorResponse(w, http.StatusBadRequest, "failed to parse pagination params", err.Error())
+		return
+	}
+	categories, paginationMeta, err := h.store.GetAll(pagination)
 	if err != nil {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to get categories", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", categories)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", categories, paginationMeta)
 }
 
 func (h *Handler) getCategoryByID(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +49,7 @@ func (h *Handler) getCategoryByID(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to get category", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", category)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", category, nil)
 }
 
 func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +70,7 @@ func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to create category", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusCreated, "success", newCategory)
+	utils.NewSuccessResponse(w, http.StatusCreated, "success", newCategory, nil)
 }
 
 func (h *Handler) updateCategory(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +99,7 @@ func (h *Handler) updateCategory(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to update category", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", updatedCategory)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", updatedCategory, nil)
 }
 
 func (h *Handler) deleteCategory(w http.ResponseWriter, r *http.Request) {
@@ -108,5 +113,5 @@ func (h *Handler) deleteCategory(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to delete category", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", nil)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", nil, nil)
 }

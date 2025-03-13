@@ -24,12 +24,19 @@ func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 }
 
 func (h *Handler) getAllMenus(w http.ResponseWriter, r *http.Request) {
-	menus, err := h.store.GetAll()
+
+	pagination, err := types.ParsePaginationRequest(r)
+	if err != nil {
+		utils.NewErrorResponse(w, http.StatusBadRequest, "failed to parse pagination params", err.Error())
+		return
+	}
+
+	menus, paginationMeta, err := h.store.GetAll(pagination)
 	if err != nil {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to get menus", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success 2", menus)
+	utils.NewSuccessResponse(w, http.StatusOK, "success 2", menus, paginationMeta)
 }
 
 func (h *Handler) getMenuByID(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +51,7 @@ func (h *Handler) getMenuByID(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to get menu", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", menu)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", menu, nil)
 }
 
 func (h *Handler) createMenu(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +72,7 @@ func (h *Handler) createMenu(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to create menu", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusCreated, "success", newMenu)
+	utils.NewSuccessResponse(w, http.StatusCreated, "success", newMenu, nil)
 }
 
 func (h *Handler) updateMenu(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +101,7 @@ func (h *Handler) updateMenu(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to update menu", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", updatedMenu)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", updatedMenu, nil)
 }
 
 func (h *Handler) deleteMenu(w http.ResponseWriter, r *http.Request) {
@@ -109,5 +116,5 @@ func (h *Handler) deleteMenu(w http.ResponseWriter, r *http.Request) {
 		utils.NewErrorResponse(w, http.StatusInternalServerError, "failed to delete menu", err.Error())
 		return
 	}
-	utils.NewSuccessResponse(w, http.StatusOK, "success", nil)
+	utils.NewSuccessResponse(w, http.StatusOK, "success", nil, nil)
 }

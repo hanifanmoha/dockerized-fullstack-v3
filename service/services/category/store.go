@@ -14,10 +14,30 @@ func NewStore(db *gorm.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) GetAll() ([]types.Category, error) {
+func (s *Store) GetAll(pagination types.PaginationRequest) ([]types.Category, types.PaginationMeta, error) {
 	var categories []types.Category
-	err := s.db.Find(&categories).Error
-	return categories, err
+
+	q := s.db.Model(&types.Category{})
+
+	var count int64
+
+	if err := q.Count(&count).Error; err != nil {
+		return nil, types.PaginationMeta{}, err
+	}
+
+	paginationMeta := types.PaginationMeta{
+		Total: count,
+		Limit: pagination.Limit,
+	}
+
+	err := q.
+		Order("id").
+		Offset((pagination.Page - 1) * pagination.Limit).
+		Limit(pagination.Limit).
+		Find(&categories).
+		Error
+
+	return categories, paginationMeta, err
 }
 
 func (s *Store) GetByID(id int) (types.Category, error) {

@@ -1,7 +1,7 @@
 package types
 
 type CategoryStore interface {
-	GetAll() ([]Category, error)
+	GetAll(pagination PaginationRequest) ([]Category, PaginationMeta, error)
 	GetByID(id int) (Category, error)
 	Create(category Category) (Category, error)
 	Update(category Category) (Category, error)
@@ -9,7 +9,7 @@ type CategoryStore interface {
 }
 
 type MenuStore interface {
-	GetAll() ([]Menu, error)
+	GetAll(pagination PaginationRequest) ([]Menu, PaginationMeta, error)
 	GetByID(id int) (Menu, error)
 	Create(menu Menu) (Menu, error)
 	Update(menu Menu) (Menu, error)
