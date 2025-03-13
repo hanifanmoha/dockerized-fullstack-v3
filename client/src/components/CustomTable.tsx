@@ -7,12 +7,13 @@ import {
   Table as TanstackTable,
   useReactTable,
 } from '@tanstack/react-table'
+import PaginationController from './PaginationController'
 
 interface CustomTable<TData> {
   table: TanstackTable<TData>
 }
 
-function CustomTable<TData>({ table } : CustomTable<TData>) {
+function CustomTable<TData>({ table }: CustomTable<TData>) {
 
   return (
     <div className="overflow-x-auto">
@@ -24,9 +25,9 @@ function CustomTable<TData>({ table } : CustomTable<TData>) {
                 {header.isPlaceholder
                   ? null
                   : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
               </Table.HeadCell>
             ))}
           </Table.Head>
@@ -50,6 +51,7 @@ function CustomTable<TData>({ table } : CustomTable<TData>) {
           ))}
         </Table.Body>
       </Table>
+      <PaginationController currentPage={table.getState().pagination.pageIndex} pageCount={table.getPageCount()} goToPage={table.setPageIndex} goToFirstPage={table.firstPage} goToLastPage={table.lastPage} />
     </div>
   )
 }

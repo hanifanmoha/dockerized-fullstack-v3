@@ -16,7 +16,7 @@ func NewStore(db *gorm.DB) *Store {
 
 func (s *Store) GetAll() ([]types.Menu, error) {
 	var menus []types.Menu
-	err := s.db.Preload("Category").Find(&menus).Error
+	err := s.db.Preload("Category").Order("id").Find(&menus).Error
 	return menus, err
 }
 
