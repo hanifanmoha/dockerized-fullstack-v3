@@ -1,19 +1,36 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 
 import {
   getCoreRowModel,
   getPaginationRowModel,
+  PaginationState,
   useReactTable,
 } from '@tanstack/react-table'
 import { getMenus } from '../../utils/restodb'
 import listMenuColumns from '../../tables/listmenu'
 import CustomTable from '../../components/CustomTable'
+import { useEffect, useState } from 'react'
+
+type Pagination = {
+  page: number
+  limit: number
+}
 
 export const Route = createFileRoute('/menus/')({
   component: RouteComponent,
-  loader: async () => {
+  validateSearch: (search: Record<string, unknown>): Pagination => {
+    // validate and parse the search params into a typed state
     return {
-      menus: await getMenus(),
+      page: Number(search?.page ?? 1),
+      limit: Number(search?.limit ?? 10),
+    }
+  },
+  loaderDeps: ({ search }: { search: Pagination }): Pagination => search,
+  loader: async ({ deps }) => {
+    const { menus, meta } = await getMenus(deps)
+    return {
+      menus,
+      meta
     }
   },
 })
@@ -22,12 +39,28 @@ function RouteComponent() {
   const data = Route.useLoaderData()
   const menus = data.menus
 
+  const navigate = useNavigate({ from: Route.fullPath })
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: data.meta.current - 1,
+    pageSize: data.meta.limit,
+  })
+
   const table = useReactTable({
     data: menus,
     columns: listMenuColumns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination,
+    manualPagination: true,
+    rowCount: data.meta.total
   })
+
+  useEffect(() => {
+    navigate({ search: { page: pagination.pageIndex + 1, limit: pagination.pageSize } })
+  }, [pagination])
 
   return (
     <>
@@ -40,7 +73,8 @@ function RouteComponent() {
           + Create
         </Link>
       </div>
-      <CustomTable table={table} />
+      <CustomTable table={table}>
+      </CustomTable>
     </>
   )
 }

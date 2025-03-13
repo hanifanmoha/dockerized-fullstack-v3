@@ -1,12 +1,14 @@
 import axios from "axios";
 import Menu from "../model/Menu";
 import Category from "../model/Category";
+import PaginationMeta from "../model/PaginationMeta";
 
 interface Response {
     success: boolean
     message: string
     error: string
     data: any
+    meta: any
 }
 
 export const axiosInstance = axios.create({
@@ -57,13 +59,16 @@ export const deleteCategory = async (id: number): Promise<void> => {
     }
 };
 
-export const getMenus = async (): Promise<Menu[]> => {
-    const response = await axiosInstance.get("/menus");
+export const getMenus = async ({ page, limit }: { page: number, limit: number }): Promise<{ menus: Menu[], meta: PaginationMeta }> => {
+    const response = await axiosInstance.get("/menus", { params: { page, limit } });
     const data = response.data as Response
     if (!data.success) {
         throw new Error(data.error)
     }
-    return data.data.map((menu: any) => Menu.fromJson(menu));
+    const menus = data.data.map((menu: any) => Menu.fromJson(menu))
+    const meta = PaginationMeta.fromJson(data.meta)
+    meta.setCurrent(page)
+    return { menus, meta }
 };
 
 export const getMenu = async (id: number): Promise<Menu> => {

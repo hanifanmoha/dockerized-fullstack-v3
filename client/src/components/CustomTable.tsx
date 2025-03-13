@@ -8,12 +8,13 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import PaginationController from './PaginationController'
+import { Children } from 'react'
 
-interface CustomTable<TData> {
+interface CustomTable<TData> extends React.PropsWithChildren {
   table: TanstackTable<TData>
 }
 
-function CustomTable<TData>({ table }: CustomTable<TData>) {
+function CustomTable<TData>({ table, children }: CustomTable<TData>) {
 
   return (
     <div className="overflow-x-auto">
@@ -52,6 +53,7 @@ function CustomTable<TData>({ table }: CustomTable<TData>) {
         </Table.Body>
       </Table>
       <PaginationController currentPage={table.getState().pagination.pageIndex} pageCount={table.getPageCount()} goToPage={table.setPageIndex} goToFirstPage={table.firstPage} goToLastPage={table.lastPage} />
+      {children}
     </div>
   )
 }
